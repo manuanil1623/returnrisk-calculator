@@ -1,18 +1,28 @@
 import React, { useState } from 'react';
 import { useAuth } from '../context/AuthContext';
 import StatCard from '../components/StatCard';
+import ModelComparison from '../components/ModelComparison';
+import DataDriftAlert from '../components/DataDriftAlert';
 import { adminStats, activityLog } from '../mockData/mockData';
 import './AdminDashboard.css';
 
 export default function AdminDashboard() {
   const { user, logout } = useAuth();
   const [retraining, setRetraining] = useState(false);
+  const [retrainLog, setRetrainLog] = useState([]);
 
-  // Non-functional by design (per spec) — just simulates a state change
-  // so the button feels real. Wire this to POST /admin/retrain later.
   function handleRetrain() {
     setRetraining(true);
-    setTimeout(() => setRetraining(false), 1800);
+    setTimeout(() => {
+      setRetraining(false);
+      const entry = {
+        ts: new Date().toLocaleString('en-IN', { hour12: false }),
+        version: `v3.${retrainLog.length + 1}`,
+        accuracy: (87.3 + Math.random() * 1.5 - 0.5).toFixed(1),
+        note: 'Manual retrain triggered from Admin dashboard'
+      };
+      setRetrainLog(prev => [entry, ...prev]);
+    }, 1800);
   }
 
   return (
@@ -31,12 +41,13 @@ export default function AdminDashboard() {
 
       <div className="container">
         <div className="stat-grid">
-          <StatCard label="Sellers on platform" value={adminStats.totalSellers} />
-          <StatCard label="Registered shoppers" value={adminStats.totalShoppers.toLocaleString()} />
-          <StatCard label="Platform return rate" value={`${adminStats.platformReturnRate}%`} />
-          <StatCard label="Model accuracy" value={`${adminStats.modelAccuracy}%`} tone="good" />
+          <StatCard label="Sellers on platform"   value={adminStats.totalSellers} />
+          <StatCard label="Registered shoppers"   value={adminStats.totalShoppers.toLocaleString()} />
+          <StatCard label="Platform return rate"  value={`${adminStats.platformReturnRate}%`} />
+          <StatCard label="Model accuracy"        value={`${adminStats.modelAccuracy}%`} tone="good" />
         </div>
 
+        {/* Retrain panel */}
         <div className="model-panel">
           <div>
             <h3 className="model-panel__title">Return-risk model</h3>
@@ -46,6 +57,24 @@ export default function AdminDashboard() {
             {retraining ? 'Retraining…' : 'Retrain model'}
           </button>
         </div>
+
+        {/* Show inline retrain log if button was used */}
+        {retrainLog.length > 0 && (
+          <div style={{ background: '#f0fdf4', border: '1px solid #bbf7d0', borderRadius: '8px', padding: '12px 16px', marginBottom: '16px' }}>
+            <div style={{ fontSize: '12px', fontWeight: '700', color: '#065f46', marginBottom: '6px' }}>✅ Recent Retrains (this session)</div>
+            {retrainLog.map((r, i) => (
+              <div key={i} style={{ fontSize: '12px', color: '#374151', marginBottom: '2px' }}>
+                <strong>{r.version}</strong> · {r.ts} · Accuracy: {r.accuracy}% · {r.note}
+              </div>
+            ))}
+          </div>
+        )}
+
+        {/* Feature 6: Data Drift Alert */}
+        <DataDriftAlert />
+
+        {/* Feature 5: Model Comparison + Version History */}
+        <ModelComparison />
 
         <h2 className="section-heading">Activity log</h2>
         <div className="activity-table-wrap">

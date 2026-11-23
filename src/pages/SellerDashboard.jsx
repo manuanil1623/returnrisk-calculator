@@ -15,6 +15,8 @@ import {
 } from 'recharts';
 import StatCard from '../components/StatCard';
 import ChartCard from '../components/ChartCard';
+import ProductLeaderboard from '../components/ProductLeaderboard';
+import WhatIfSimulator from '../components/WhatIfSimulator';
 import {
   sellerStats,
   returnsByCategory,
@@ -213,6 +215,10 @@ export default function SellerDashboard() {
             </ResponsiveContainer>
           </ChartCard>
         </div>
+
+        {/* Product Health Leaderboard & What-If Simulator */}
+        <ProductLeaderboard />
+        <WhatIfSimulator />
 
         <h2 className="section-heading">Pre-Dispatch High-Risk Orders Ledger</h2>
 
