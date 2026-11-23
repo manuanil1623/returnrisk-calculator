@@ -65,8 +65,6 @@ export default function FitWhisperer({ category, onSizeSelect }) {
     setResults(getSuggestion(h, w, category));
   }
 
-  const chart = SIZE_CHARTS[category] || SIZE_CHARTS.Clothing;
-
   return (
     <div style={{
       background: 'linear-gradient(135deg, #f0fdf4 0%, #ecfdf5 100%)',
